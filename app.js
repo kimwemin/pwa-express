@@ -3,6 +3,7 @@ import authRouter from './routes/auth.router.js';
 import usersRouter from './routes/users.router.js';
 import { eduTest, eduUsersTest } from './app/middlewares/edu/edu.middleware.js';
 import { errorHandler } from './app/middlewares/errors/error-handler.js';
+import eduRouter from './routes/edu.router.js';
 
 const app = express();
 app.use(express.json()); // JSON으로 요청이 올 경우 파싱 처리
@@ -73,6 +74,7 @@ app.use('/api/auth', authRouter);
 // 2. 유저 정보 수정
 //    >> '유저 정보 수정 완료'
 app.use('/api/users', eduUsersTest, usersRouter);
+app.use(eduRouter);
 
 // 에러 테스트용 라우트
 app.get('/error', (request, response, next) => {
