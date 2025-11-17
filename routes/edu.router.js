@@ -2,7 +2,7 @@ import express from 'express';
 import db from '../app/models/index.js';
 import { Op } from 'sequelize';
 import dayjs from 'dayjs';
-const { sequelize, Employee } = db;
+const { sequelize, Employee, TitleEmp, Title } = db;
 
 const eduRouter = express.Router();
 
@@ -209,14 +209,45 @@ eduRouter.get('/api/edu', async (request, response, next) => {
 
     // -------------------
     // groupby, having
-    result = await Employee.findAll({
-      attributes: [
-        'gender',
-        [sequelize.fn('COUNT', sequelize.col('*')), 'cnt_gender']
+    // result = await Employee.findAll({
+    //   attributes: [
+    //     'gender',
+    //     [sequelize.fn('COUNT', sequelize.col('*')), 'cnt_gender']
+    //   ],
+    //   group: ['gender'],
+    //   // literal : 작성한 내용을 그대로 쿼리문으로 쓰겠다는 함수
+    //   having: sequelize.literal('cnt_gender >= 40000'),
+    // });
+
+    // join
+    result = await Employee.findOne({
+      attributes: ['empId', 'name'],
+      where: {
+        empId: 1
+      },
+      include: [
+        {
+          model: TitleEmp, // 내가 연결할 모델
+          as: 'titleEmps', // 내가 사용할 관계의 별칭
+          required: true, // `true`면 Inner Join, `false`면 Left Outer Join
+          attributes: ['titleCode'],
+          where: {
+            endAt: {
+              [Op.is]: null,
+            }
+          },
+          include: [
+            {
+              // model: Title,
+              // as: 'title',
+              // 위처럼 model, as 두개를 사용하지 않고 아래처럼 association을 사용해 별칭 만으로도 지정할 수 있다
+              association: 'title',
+              required: true,
+              attributes: ['title'],
+            }
+          ]
+        }
       ],
-      group: ['gender'],
-      // literal : 작성한 내용을 그대로 쿼리문으로 쓰겠다는 함수
-      having: sequelize.literal('cnt_gender >= 40000'),
     });
 
     return response.status(200).send({

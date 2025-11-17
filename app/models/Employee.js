@@ -144,6 +144,14 @@ const Employee = {
 
     return defineEmployee;
   },
+  // 모델 관계를 정의
+  associate: (db) => {
+    // 1:n 관계에서 부모 모델에 설정하는 방법 (1명의 사원은 복수의 직급 정보를 가진다.)
+    // 보통 1쪽이 부모 모델, n쪽을 자식 모델이라고 부른다
+    // sourceKey : 부모 모델의 참조 당하는 컬럼명
+    // foreignKey : FK가 부여될 자식 모델의 참조한 컬럼명
+    db.Employee.hasMany(db.TitleEmp, { sourceKey: 'empId', foreignKey: 'empId', as: 'titleEmps' });
+  }
 };
 
 export default Employee;
